@@ -1,0 +1,2 @@
+site,n_records,n_events,optimal_lag_hours,optimal_threshold,train_years,test_years,test_f1,test_precision,test_recall,test_far,mean_lead_hours
+washington,203827,15,0,0.8700000000000006,2001-2016,2017-2024,0.004662004662004662,0.002467308166790032,0.04219409282700422,0.9975326918332099,35.0

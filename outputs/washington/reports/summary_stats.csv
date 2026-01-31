@@ -1,0 +1,2 @@
+site,optimal_threshold,optimal_lag_hours,test_f1,test_precision,test_recall,test_far,mean_lead_hours,n_events,n_samples
+washington,0.8700000000000006,0,0.004662004662004662,0.002467308166790032,0.04219409282700422,0.9975326918332099,35.0,9,69474

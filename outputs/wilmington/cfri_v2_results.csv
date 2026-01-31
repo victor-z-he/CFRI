@@ -1,0 +1,2 @@
+site,cfri_version,threshold,f1,precision,recall,far,n_events_detected,n_events_total,mean_lead_hours,median_lead_hours
+wilmington,v2,0.95,0.22600408441116407,0.2234185733512786,0.22865013774104684,0.7765814266487214,29,53,60.37931034482759,64.0

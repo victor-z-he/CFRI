@@ -1,0 +1,2 @@
+site,optimal_threshold,optimal_lag_hours,test_f1,test_precision,test_recall,test_far,mean_lead_hours,n_events,n_samples
+wilmington,0.9500000000000006,22,0.26370370370370366,0.2267515923566879,0.31504424778761064,0.7732484076433122,61.28,40,78888

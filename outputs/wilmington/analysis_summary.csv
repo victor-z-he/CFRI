@@ -1,0 +1,2 @@
+site,n_records,n_events,optimal_lag_hours,optimal_threshold,train_years,test_years,test_f1,test_precision,test_recall,test_far,mean_lead_hours
+wilmington,262987,53,22,0.9500000000000006,1995-2015,2016-2024,0.26370370370370366,0.2267515923566879,0.31504424778761064,0.7732484076433122,61.28

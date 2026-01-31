@@ -1,0 +1,201 @@
+# NCSEF Compound Flood Index Configuration
+# ==========================================
+# Physics-Informed Early-Warning Index for Compound River-Coastal Flooding
+
+# Global settings
+global:
+  random_seed: 42
+  timezone: "UTC"
+  analysis_period:
+    start: "1994-01-01"
+    end: "2023-12-31"
+  output_dir: "outputs"
+
+# Site configurations
+sites:
+  wilmington:
+    name: "Wilmington-Cape Fear"
+    description: "Cape Fear River estuary system"
+
+    # Data file paths (relative to project root or absolute)
+    data:
+      river:
+        file: "data/wilmington/wilmington_discharge.csv"
+        datetime_col: "datetime"
+        value_col: "discharge_cms"
+        units: "cms"
+      tide:
+        file: "data/wilmington/wilmington_water_level.csv"
+        datetime_col: "datetime"
+        value_col: "water_level"
+        units: "m"
+        datum: "MHHW"  # Data is already in MHHW from NOAA API
+
+    # Station metadata
+    stations:
+      river:
+        id: "02105769"
+        name: "Cape Fear River at Lock 1"
+        source: "USGS"
+      tide:
+        id: "8658120"
+        name: "Wilmington, NC"
+        source: "NOAA"
+
+    # Datum conversions (meters)
+    # MHHW = Mean Higher High Water
+    # MLLW = Mean Lower Low Water
+    datums:
+      mhhw_above_mllw: 1.23  # MHHW - MLLW offset in meters
+      navd88_to_mllw: 0.0    # If data is in NAVD88
+
+    # NOAA flood thresholds (meters above MHHW)
+    flood_thresholds:
+      minor: 0.56   # Minor flooding threshold
+      moderate: 0.87
+      major: 1.17
+
+  washington:
+    name: "Washington-Tar-Pamlico"
+    description: "Tar-Pamlico River estuary system"
+
+    data:
+      river:
+        file: "data/washington/washington_discharge.csv"
+        datetime_col: "datetime"
+        value_col: "discharge_cms"
+        units: "cms"
+      tide:
+        file: "data/washington/washington_water_level.csv"
+        datetime_col: "datetime"
+        value_col: "water_level"
+        units: "m"
+        datum: "MHHW"  # Data is already in MHHW from NOAA API
+
+    stations:
+      river:
+        id: "02084000"
+        name: "Tar River at Greenville"
+        source: "USGS"
+      tide:
+        id: "8652587"
+        name: "Washington, NC"
+        source: "NOAA"
+
+    datums:
+      mhhw_above_mllw: 0.37  # Smaller tidal range in Pamlico Sound
+      navd88_to_mllw: 0.0
+
+    flood_thresholds:
+      minor: 0.70
+      moderate: 1.07
+      major: 1.37
+
+# Preprocessing settings
+preprocessing:
+  # Missing data handling
+  missing_data:
+    max_gap_hours: 6           # Max gap to interpolate
+    interpolation_method: "linear"
+    report_threshold: 0.05     # Warn if >5% missing
+
+  # Outlier handling
+  outliers:
+    method: "iqr"              # "iqr", "zscore", or "none"
+    iqr_factor: 3.0            # Flag values > Q3 + factor*IQR
+    action: "flag"             # "flag", "remove", or "clip"
+
+# Flood event detection
+events:
+  min_separation_hours: 12     # Minimum gap between events
+  min_duration_hours: 1        # Minimum event duration
+  pre_event_window_hours: 48   # Window before event for baseline
+
+# Feature engineering
+features:
+  # Percentile normalization
+  normalization:
+    method: "percentile"       # "percentile" or "zscore"
+    robust_zscore: false       # Use median/MAD instead of mean/std
+
+  # Lag estimation
+  lag:
+    search_range_hours: [0, 120]  # Search range for optimal lag
+    step_hours: 1
+    method: "hybrid"           # "xcorr", "event", or "hybrid"
+    min_events_for_event_lag: 10
+
+  # CFRI weights
+  cfri:
+    default_weights:
+      river: 0.333
+      coastal: 0.333
+      overlap: 0.333
+    overlap_method: "multiplicative"  # "multiplicative" or "threshold"
+    overlap_thresholds:        # Only used if method="threshold"
+      river_percentile: 0.90
+      coastal_percentile: 0.90
+
+# Threshold selection
+thresholding:
+  lookahead_hours: 24          # Prediction window L
+  train_fraction: 0.70         # 70% train, 30% test
+  cv_method: "temporal"        # "temporal" or "blocked"
+  cv_n_splits: 5               # For blocked CV
+
+  # Grid search
+  grid:
+    start: 0.20
+    end: 0.95
+    step: 0.01
+
+  # Selection criteria
+  selection:
+    primary_metric: "f1"
+    max_far: 0.30              # Maximum false alarm rate
+    tiebreaker: "lead_time"
+
+# Evaluation settings
+evaluation:
+  # Baseline models for comparison
+  baselines:
+    - "wl_only"                # Water level only
+    - "q_only"                 # Discharge only
+    - "persistence"            # Previous hour flood state
+
+  # Bootstrap confidence intervals
+  bootstrap:
+    enabled: true
+    n_iterations: 1000
+    confidence_level: 0.95
+
+# Sensitivity analysis
+sensitivity:
+  lag_variations: [-12, -6, 0, 6, 12]  # Hours from optimal
+  weight_variations:
+    overlap: [0.20, 0.333, 0.50]
+  lookahead_variations: [12, 24, 48]
+
+# Plotting settings
+plotting:
+  style: "publication"
+  figsize:
+    killer: [14, 10]
+    panel: [12, 4]
+  dpi: 300
+  font_sizes:
+    title: 16
+    label: 14
+    tick: 12
+    legend: 11
+  colors:
+    river: "#1f77b4"           # Blue
+    coastal: "#2ca02c"         # Green
+    cfri: "#d62728"            # Red
+    flood: "#ff7f0e"           # Orange
+    threshold: "#7f7f7f"       # Gray
+
+# Report generation
+reports:
+  abstract_word_limit: 250
+  include_confidence_intervals: true
