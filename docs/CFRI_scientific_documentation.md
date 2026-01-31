@@ -1,7 +1,7 @@
 # Compound Flood Risk Index (CFRI)
 ## A Physics-Informed Early Warning System for Compound River-Coastal Flooding
 
-**Author:** NCSEF Student Researcher
+**Author:** Victor He, Cary Academy
 **Version:** 2.0
 **Date:** January 2025
 **Study Site:** Wilmington, NC (Cape Fear River Estuary)
@@ -268,3 +268,4 @@ Amplification = P(flood | Q>90th, WL>90th) / [P(flood|Q>90th) + P(flood|WL>90th)
 ```
 
 For Wilmington: Amplification ≈ 1.6x (flood risk 60% higher than additive expectation)
+
